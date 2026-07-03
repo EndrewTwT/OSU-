@@ -4,157 +4,144 @@ const music = document.getElementById("music");
 const scoreText = document.getElementById("score");
 const lifeBar = document.getElementById("life");
 const judgement = document.getElementById("judgement");
-const start = document.getElementById("start");
+const startBtn = document.getElementById("start");
 
 let beatmap = [];
 
 let score = 0;
 let hp = 100;
+let combo = 0;
 
 let currentNote = 0;
 
-const APPROACH = 1000;
+const APPROACH_TIME = 1000;
 
-start.onclick = async () => {
+let running = false;
 
-    start.style.display = "none";
+startBtn.onclick = async () => {
 
-    const response = await fetch("beatmap.json");
-    beatmap = await response.json();
+    beatmap = await fetch("beatmap.json").then(r => r.json());
 
     score = 0;
     hp = 100;
+    combo = 0;
     currentNote = 0;
 
     scoreText.innerHTML = "Score: 0";
     lifeBar.style.width = "100%";
 
-   music.currentTime = 0;
+    judgement.innerHTML = "";
 
-music.play().then(() => {
-    requestAnimationFrame(update);
-});
+    music.currentTime = 0;
+
+    await music.play();
+
+    if (!running) {
+        running = true;
+        requestAnimationFrame(update);
+    }
+};
 
 function update(){
 
+    if (!running) return;
+
     const now = music.currentTime * 1000;
 
-    while(
+    while (
         currentNote < beatmap.length &&
-        now >= beatmap[currentNote].time - APPROACH
-    ){
-        spawn(beatmap[currentNote]);
+        now >= beatmap[currentNote].time - APPROACH_TIME
+    ) {
+        spawnNote(beatmap[currentNote]);
         currentNote++;
     }
 
     requestAnimationFrame(update);
 }
 
-function spawn(note){
+function spawnNote(note){
 
-    const noteDiv = document.createElement("div");
-    noteDiv.className = "note";
-
-    noteDiv.style.left = note.x + "px";
-    noteDiv.style.top = note.y + "px";
+    const wrapper = document.createElement("div");
+    wrapper.className = "note";
+    wrapper.style.left = note.x + "px";
+    wrapper.style.top = note.y + "px";
 
     const approach = document.createElement("div");
     approach.className = "approach";
-    approach.style.animationDuration = APPROACH+"ms";
+    approach.style.animationDuration = APPROACH_TIME + "ms";
 
     const circle = document.createElement("div");
     circle.className = "circle";
 
-    noteDiv.appendChild(approach);
-    noteDiv.appendChild(circle);
+    wrapper.appendChild(approach);
+    wrapper.appendChild(circle);
+    game.appendChild(wrapper);
 
-    game.appendChild(noteDiv);
+    circle.onclick = () => hit(note, wrapper);
 
-    circle.onclick = ()=>{
-
-        hit(note,noteDiv);
-
-    };
-
-    setTimeout(()=>{
-
-        if(noteDiv.parentNode){
-
-            miss();
-
-            noteDiv.remove();
-
+    setTimeout(() => {
+        if (wrapper.parentNode) {
+            miss(wrapper);
         }
-
-    },APPROACH+150);
-
+    }, APPROACH_TIME + 150);
 }
 
-function hit(note,noteDiv){
+function hit(note, wrapper){
 
-    const error = Math.abs(
-        music.currentTime*1000-note.time
-    );
+    const diff = Math.abs(music.currentTime * 1000 - note.time);
 
-    if(error<=40){
+    let result = "";
 
+    if (diff <= 40) {
+        result = "300";
         addScore(300);
-
-    }
-    else if(error<=80){
-
+    } else if (diff <= 80) {
+        result = "100";
         addScore(100);
-
-    }
-    else if(error<=120){
-
+    } else if (diff <= 120) {
+        result = "50";
         addScore(50);
-
-    }
-    else{
-
-        miss();
-
+    } else {
+        miss(wrapper);
+        return;
     }
 
-    noteDiv.remove();
+    combo++;
+    showResult(result);
+    wrapper.remove();
+}
 
+function miss(wrapper){
+
+    hp -= 12;
+    combo = 0;
+
+    if (hp < 0) hp = 0;
+
+    lifeBar.style.width = hp + "%";
+
+    showResult("MISS");
+
+    if (wrapper) wrapper.remove();
 }
 
 function addScore(value){
 
-    score+=value;
+    score += value + combo * 2;
 
-    hp=Math.min(100,hp+4);
+    hp = Math.min(100, hp + 3);
 
-    scoreText.innerHTML="Score: "+score;
+    scoreText.innerHTML = "Score: " + score;
 
-    lifeBar.style.width=hp+"%";
-
-    show(value);
-
+    lifeBar.style.width = hp + "%";
 }
 
-function miss(){
+function showResult(text){
 
-    hp-=12;
-
-    if(hp<0) hp=0;
-
-    lifeBar.style.width=hp+"%";
-
-    show("MISS");
-
-}
-
-function show(text){
-
-    judgement.innerHTML=text;
-
+    judgement.innerHTML = text;
     judgement.classList.remove("show");
 
     void judgement.offsetWidth;
 
     judgement.classList.add("show");
-
 }
