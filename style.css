@@ -1,0 +1,183 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:#111;
+    overflow:hidden;
+    font-family:Arial;
+    color:white;
+}
+
+#game{
+
+    position:relative;
+    width:100vw;
+    height:100vh;
+}
+
+#hud{
+
+    position:absolute;
+    top:15px;
+    left:15px;
+    z-index:100;
+}
+
+#score{
+
+    font-size:28px;
+    margin-bottom:12px;
+}
+
+#lifeContainer{
+
+    width:320px;
+    height:22px;
+
+    background:#333;
+
+    border-radius:20px;
+
+    overflow:hidden;
+}
+
+#life{
+
+    width:100%;
+    height:100%;
+
+    background:linear-gradient(90deg,#00ff88,#00ff00);
+
+    transition:.2s;
+}
+
+#judgement{
+
+    position:absolute;
+
+    left:45vw;
+    top:45vh;
+
+    font-size:55px;
+
+    font-weight:bold;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    animation-duration:.5s;
+}
+
+.note{
+
+    position:absolute;
+
+    width:80px;
+    height:80px;
+
+    transform:translate(-50%,-50%);
+}
+
+.circle{
+
+    width:80px;
+    height:80px;
+
+    border-radius:50%;
+
+    background:#00bfff;
+
+    border:5px solid white;
+
+    position:absolute;
+
+    z-index:2;
+
+    cursor:pointer;
+
+    box-shadow:0 0 25px cyan;
+}
+
+.approach{
+
+    position:absolute;
+
+    width:80px;
+    height:80px;
+
+    border-radius:50%;
+
+    border:4px solid white;
+
+    transform:scale(2.4);
+
+    animation:approach linear forwards;
+
+    z-index:1;
+}
+
+@keyframes approach{
+
+    from{
+
+        transform:scale(2.4);
+    }
+
+    to{
+
+        transform:scale(1);
+    }
+
+}
+
+.show{
+
+    animation:judge .5s;
+}
+
+@keyframes judge{
+
+0%{
+
+opacity:1;
+transform:translateY(0px) scale(1);
+
+}
+
+100%{
+
+opacity:0;
+transform:translateY(-70px) scale(1.4);
+
+}
+
+}
+
+#start{
+
+    position:absolute;
+
+    bottom:30px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font-size:22px;
+
+    padding:14px 35px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:#00bfff;
+
+    color:white;
+}
