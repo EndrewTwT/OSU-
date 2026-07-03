@@ -43,15 +43,11 @@ function update(){
         currentNote < beatmap.length &&
         now >= beatmap[currentNote].time - APPROACH
     ){
-
         spawn(beatmap[currentNote]);
-
         currentNote++;
-
     }
 
     requestAnimationFrame(update);
-
 }
 
 function spawn(note){
