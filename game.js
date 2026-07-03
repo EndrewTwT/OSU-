@@ -29,11 +29,11 @@ start.onclick = async () => {
     scoreText.innerHTML = "Score: 0";
     lifeBar.style.width = "100%";
 
-    music.play();
+   music.currentTime = 0;
 
+music.play().then(() => {
     requestAnimationFrame(update);
-
-};
+});
 
 function update(){
 
